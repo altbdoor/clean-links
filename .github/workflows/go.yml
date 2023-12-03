@@ -1,0 +1,35 @@
+name: Build Go
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: "./go.mod"
+
+      - run: |
+          go build -ldflags "-s -w" -o clean-links
+          TGZ_NAME="clean-links-${RUNNER_OS,,}.tgz"
+          tar czf $TGZ_NAME clean-links
+        env:
+          CGO_ENABLED: 0
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: "clean-links-*.tgz"
