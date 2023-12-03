@@ -25,7 +25,8 @@ jobs:
 
       - run: |
           go build -ldflags "-s -w" -o clean-links
-          TGZ_NAME="clean-links-${RUNNER_OS,,}.tgz"
+          LOWER_RUNNER_OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
+          TGZ_NAME="clean-links-$LOWER_RUNNER_OS.tgz"
           tar czf $TGZ_NAME clean-links
         env:
           CGO_ENABLED: 0
