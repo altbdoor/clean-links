@@ -16,13 +16,14 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          # https://www.lifewire.com/fix-developer-cannot-be-verified-error-5183898
-          # - macos-latest
+          - macos-latest
         include:
           - os: ubuntu-latest
             binary_name: clean-links
           - os: windows-latest
             binary_name: clean-links.exe
+          - os: macos-latest
+            binary_name: clean-links
     steps:
       - uses: actions/checkout@v4
 

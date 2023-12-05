@@ -16,3 +16,14 @@ Future improvements:
   - See <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#integration_with_html>
 - [ ] Customize the `referrerpolicy` values
 - [ ] Exclude elements based on condition
+
+## Usage
+
+1. Download the TGZ package from [releases](https://github.com/altbdoor/clean-links/releases)
+1. Unpack the TGZ file
+   - `tar xzf clean-links-*.tgz`
+1. For Linux based distribution, just call `./clean-links`
+1. For Windows based distribution, just call `./clean-links.exe`
+1. For MacOS based distribution:
+   1. Get the binary out of quarantine with `xattr -d com.apple.quarantine clean-links`
+   1. Just call `./clean-links`
