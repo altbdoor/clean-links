@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -57,26 +58,29 @@ func parseHTMLFile(filePath string) (*html.Node, error) {
 	return doc, nil
 }
 
-func recursivePatchLinks(node *html.Node) {
+func recursivePatchNode(node *html.Node, nodeName string, relValue string, excludeClass string) {
 	if node.Type == html.ElementNode {
-		if node.Data == "a" {
-			foundRelAttr := false
+		var attrs []string
+		for _, attr := range node.Attr {
+			attrs = append(attrs, strings.ToLower(attr.Key))
+		}
 
-			for idx, attr := range node.Attr {
-				if strings.ToLower(attr.Key) == "rel" {
-					foundRelAttr = true
-					node.Attr[idx].Val = "noreferrer"
-					break
-				}
-			}
+		classNameIdx := slices.Index(attrs, "class")
+		if classNameIdx != -1 && strings.Contains(node.Attr[classNameIdx].Val, excludeClass) {
+			return
+		}
 
-			if !foundRelAttr {
-				node.Attr = append(node.Attr, html.Attribute{Key: "rel", Val: "noreferrer"})
+		if node.Data == nodeName {
+			relIdx := slices.Index(attrs, "rel")
+			if relIdx == -1 {
+				node.Attr = append(node.Attr, html.Attribute{Key: "rel", Val: relValue})
+			} else {
+				node.Attr[relIdx].Val = relValue
 			}
 		}
 	}
 
 	for childNode := node.FirstChild; childNode != nil; childNode = childNode.NextSibling {
-		recursivePatchLinks(childNode)
+		recursivePatchNode(childNode, nodeName, relValue, excludeClass)
 	}
 }

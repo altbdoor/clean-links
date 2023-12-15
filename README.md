@@ -2,20 +2,22 @@
 
 _A small experiment to test out [Golang](https://go.dev/) myself._
 
-An application that:
+A CLI application that:
 
+1. Accepts one or more paths
 1. Walks through all HTML files
 1. Looks for `<a>` elements
 1. Add `rel="noreferrer"` attribute
-   - [`rel="noopener"` is already implied](https://github.com/jsx-eslint/eslint-plugin-react/issues/2022) for most modern browsers
+   - `rel="noreferrer"` will imply `rel="noopener"` for most modern browsers ([ref](https://github.com/jsx-eslint/eslint-plugin-react/issues/2022))
 
 Future improvements:
 
-- [ ] Customize `rel` values
+- [x] Customize `rel` values
 - [ ] Handle other elements
   - See <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#integration_with_html>
 - [ ] Customize the `referrerpolicy` values
 - [ ] Exclude elements based on condition
+  - [x] Exclude based on `class`
 
 ## Usage
 

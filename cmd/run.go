@@ -17,6 +17,7 @@ import (
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
+	Args:  cobra.MinimumNArgs(1),
 	Short: "Runs clean-links on a specified path",
 	// 	Long: `A longer description that spans multiple lines and likely contains examples
 	// and usage of using your command. For example:
@@ -30,8 +31,8 @@ var runCmd = &cobra.Command{
 func performRun(cmd *cobra.Command, args []string) {
 	startOpTime := time.Now()
 	paths := standardizePath(args)
-	var htmlFiles []string
 
+	var htmlFiles []string
 	for _, path := range paths {
 		foundHtmlFiles, err := findHTMLFiles(path)
 
@@ -45,6 +46,9 @@ func performRun(cmd *cobra.Command, args []string) {
 	htmlFilesCount := len(htmlFiles)
 	fmt.Printf("(i) Found %d HTML files.\n", htmlFilesCount)
 
+	excludeClass, _ := cmd.Flags().GetString("excludeClass")
+	aValue, _ := cmd.Flags().GetString("aValue")
+
 	for idx, file := range htmlFiles {
 		startFileTime := time.Now()
 		doc, err := parseHTMLFile(file)
@@ -54,7 +58,7 @@ func performRun(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		recursivePatchLinks(doc)
+		recursivePatchNode(doc, "a", aValue, excludeClass)
 
 		var buffer bytes.Buffer
 		html.Render(&buffer, doc)
@@ -81,5 +85,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	// runCmd.Flags().B
+	runCmd.Flags().StringP("excludeClass", "e", "clean-links-exclude", `HTML elements with this class will not be processed. Subsequent child elements will not be processed as well.`)
+	// runCmd.Flags().StringSlice("elements", []string{"a"}, `Run the clean function on which elements. Valid values are "a,area,img,iframe,script,link".`)
+	runCmd.Flags().String("aValue", "noreferrer", `The value the "rel" attribute in "<a>" elements.`)
+	// runCmd.MarkFlagRequired("foo")
 }
