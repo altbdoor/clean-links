@@ -7,15 +7,16 @@ A CLI application that:
 1. Accepts one or more paths
 1. Walks through all HTML files
 1. Looks for `<a>` elements
-1. Add `rel="noreferrer"` attribute
-   - `rel="noreferrer"` will imply `rel="noopener"` for most modern browsers ([ref](https://github.com/jsx-eslint/eslint-plugin-react/issues/2022))
+1. Add `referrerpolicy="noreferrer"` attribute
+   - `referrerpolicy="noreferrer"` will imply `referrerpolicy="noopener"` for most modern browsers ([ref](https://github.com/jsx-eslint/eslint-plugin-react/issues/2022))
 
 Future improvements:
 
-- [x] Customize `rel` values
-- [ ] Handle other elements
+- [x] ~~Customize `rel` values~~
+  - Moved to `referrerpolicy`
+- [x] Handle other elements
   - See <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#integration_with_html>
-- [ ] Customize the `referrerpolicy` values
+- [x] Customize the `referrerpolicy` values
 - [ ] Exclude elements based on condition
   - [x] Exclude based on `class`
 

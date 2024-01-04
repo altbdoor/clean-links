@@ -58,7 +58,7 @@ func parseHTMLFile(filePath string) (*html.Node, error) {
 	return doc, nil
 }
 
-func recursivePatchNode(node *html.Node, nodeName string, relValue string, excludeClass string) {
+func recursivePatchNode(node *html.Node, nodeName []string, relValue string, excludeClass string) {
 	if node.Type == html.ElementNode {
 		var attrs []string
 		for _, attr := range node.Attr {
@@ -70,10 +70,10 @@ func recursivePatchNode(node *html.Node, nodeName string, relValue string, exclu
 			return
 		}
 
-		if node.Data == nodeName {
-			relIdx := slices.Index(attrs, "rel")
+		if slices.Contains(nodeName, node.Data) {
+			relIdx := slices.Index(attrs, "referrerpolicy")
 			if relIdx == -1 {
-				node.Attr = append(node.Attr, html.Attribute{Key: "rel", Val: relValue})
+				node.Attr = append(node.Attr, html.Attribute{Key: "referrerpolicy", Val: relValue})
 			} else {
 				node.Attr[relIdx].Val = relValue
 			}

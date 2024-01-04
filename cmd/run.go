@@ -28,6 +28,8 @@ var runCmd = &cobra.Command{
 	Run: performRun,
 }
 
+var choiceElems = []string{"area", "img", "iframe", "script", "link"}
+
 func performRun(cmd *cobra.Command, args []string) {
 	startOpTime := time.Now()
 	paths := standardizePath(args)
@@ -46,8 +48,25 @@ func performRun(cmd *cobra.Command, args []string) {
 	htmlFilesCount := len(htmlFiles)
 	fmt.Printf("(i) Found %d HTML files.\n", htmlFilesCount)
 
-	excludeClass, _ := cmd.Flags().GetString("excludeClass")
-	aValue, _ := cmd.Flags().GetString("aValue")
+	excludeClass, _ := cmd.Flags().GetString("exclude-class")
+	value, _ := cmd.Flags().GetString("value")
+
+	validElems := []string{"a"}
+	isFixAll, _ := cmd.Flags().GetBool("fix-all")
+
+	if isFixAll {
+		validElems = append(validElems, choiceElems...)
+	} else {
+		for _, elemName := range choiceElems {
+			elemFlag, err := cmd.Flags().GetBool("fix-" + elemName)
+
+			if err == nil && elemFlag {
+				validElems = append(validElems, elemName)
+			}
+		}
+	}
+
+	fmt.Printf("(i) Fixing %v HTML elements.\n", validElems)
 
 	for idx, file := range htmlFiles {
 		startFileTime := time.Now()
@@ -58,7 +77,7 @@ func performRun(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		recursivePatchNode(doc, "a", aValue, excludeClass)
+		recursivePatchNode(doc, validElems, value, excludeClass)
 
 		var buffer bytes.Buffer
 		html.Render(&buffer, doc)
@@ -84,9 +103,18 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	runCmd.Flags().StringP("excludeClass", "e", "clean-links-exclude", `HTML elements with this class will not be processed. Subsequent child elements will not be processed as well.`)
-	// runCmd.Flags().StringSlice("elements", []string{"a"}, `Run the clean function on which elements. Valid values are "a,area,img,iframe,script,link".`)
-	runCmd.Flags().String("aValue", "noreferrer", `The value the "rel" attribute in "<a>" elements.`)
-	// runCmd.MarkFlagRequired("foo")
+	runCmd.Flags().StringP(
+		"exclude-class",
+		"e",
+		"clean-links-exclude",
+		`HTML elements with this class will not be processed. Subsequent child elements will not be processed as well.`,
+	)
+	runCmd.Flags().String("value", "noreferrer", `The value for the "referrerpolicy" attribute in the elements.`)
+
+	for _, elemName := range choiceElems {
+		helpMsg := fmt.Sprintf("Includes <%s> elements to be fixed. Not included by default.", elemName)
+		runCmd.Flags().Bool("fix-"+elemName, false, helpMsg)
+	}
+
+	runCmd.Flags().Bool("fix-all", false, "Fixes all HTML elements listed below.")
 }

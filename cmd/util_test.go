@@ -49,26 +49,26 @@ func TestFixLinksWithExclude(t *testing.T) {
 	<a href="https://example.com">Example link</a>
 	<a href="#">Example link</a>
 	<a href="https://example.com/2" class="foo-exclude">Example link</a>
-	<a href="https://example.com/3" rel="noopener">Example link</a>
+	<a href="https://example.com/3" referrerpolicy="noopener">Example link</a>
 	<div class="foo-exclude">
 		<a href="https://example.com">Example link</a>
 		<a href="#">Example link</a>
 		<a href="https://example.com/2">Example link</a>
-		<a href="https://example.com/3" rel="noopener">Example link</a>
+		<a href="https://example.com/3" referrerpolicy="noopener">Example link</a>
 	</div>
 </div>
 	`
 
 	doc, _ := html.Parse(strings.NewReader(htmlContent))
-	recursivePatchNode(doc, "a", "noopener noreferer", "foo-exclude")
+	recursivePatchNode(doc, []string{"a"}, "noopener noreferer", "foo-exclude")
 
 	checks := []string{"noopener noreferer", "noopener noreferer", "", "noopener noreferer", "", "", "", "noopener"}
 
 	for idx, link := range findAll(doc, "a") {
-		relValue := getAttrFromNode(link, "rel")
+		relValue := getAttrFromNode(link, "referrerpolicy")
 		if relValue != checks[idx] {
 			t.Log(renderNodeToString(doc))
-			t.Logf(`EXPECTED: rel="%s"`, checks[idx])
+			t.Logf(`EXPECTED: referrerpolicy="%s"`, checks[idx])
 			t.Logf("IS: %s", renderNodeToString(link))
 			t.FailNow()
 			break
